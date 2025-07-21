@@ -1,4 +1,4 @@
-.PHONY: build test clean run install
+.PHONY: build test clean run install lint lint-fix
 
 build:
 	go build -o bin/hatena-bookmark-mcp cmd/main.go
@@ -18,3 +18,9 @@ install:
 deps:
 	go mod tidy
 	go mod download
+
+lint:
+	golangci-lint run
+
+lint-fix:
+	golangci-lint run --fix

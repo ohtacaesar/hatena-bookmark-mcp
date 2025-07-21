@@ -191,7 +191,11 @@ func (s *BookmarkService) fetchRSSFeed(ctx context.Context, requestURL string) (
 			Details: map[string]interface{}{"url": requestURL},
 		}
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			s.logger.Debug("Failed to close response body", "error", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, &types.MCPError{
@@ -229,8 +233,7 @@ func (s *BookmarkService) getPageOrDefault(page int) int {
 func isValidUsername(username string) bool {
 	// Username should contain only alphanumeric characters and hyphens
 	for _, r := range username {
-		if !((r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || 
-			 (r >= '0' && r <= '9') || r == '-') {
+		if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') && (r < '0' || r > '9') && r != '-' {
 			return false
 		}
 	}

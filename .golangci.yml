@@ -1,0 +1,33 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+output:
+  format: colored-line-number
+
+linters-settings:
+  govet:
+    shadow: true
+  dupl:
+    threshold: 100
+
+linters:
+  enable:
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
+    - ineffassign
+    - dupl
+    - misspell
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - dupl
+  max-issues-per-linter: 0
+  max-same-issues: 0
