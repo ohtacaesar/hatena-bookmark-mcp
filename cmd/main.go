@@ -5,13 +5,11 @@ import (
 	"encoding/json"
 	"log/slog"
 	"os"
-	"time"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
 	"hatena-bookmark-mcp/internal/service"
 	"hatena-bookmark-mcp/internal/types"
-	"hatena-bookmark-mcp/internal/utils"
 )
 
 const (
@@ -35,7 +33,6 @@ func main() {
 
 	// Initialize services
 	bookmarkService := service.NewBookmarkService(logger)
-	cache := utils.NewCache(5 * time.Minute) // 5-minute cache TTL
 
 	// Create MCP server with implementation
 	server := mcp.NewServer(&mcp.Implementation{
@@ -48,7 +45,7 @@ func main() {
 		Name:        "get_hatena_bookmarks",
 		Description: "Retrieve bookmarks from Hatena Bookmark RSS feed for a specified user with optional filtering",
 	}, func(ctx context.Context, cc *mcp.ServerSession, params *mcp.CallToolParamsFor[GetHatenaBookmarksParams]) (*mcp.CallToolResultFor[interface{}], error) {
-		return handleGetBookmarks(ctx, params.Arguments, bookmarkService, cache, logger)
+		return handleGetBookmarks(ctx, params.Arguments, bookmarkService, logger)
 	})
 
 	logger.Info("Registered MCP tools", "tool_count", 1)
@@ -91,7 +88,6 @@ func handleGetBookmarks(
 	ctx context.Context,
 	arguments GetHatenaBookmarksParams,
 	bookmarkService *service.BookmarkService,
-	cache *utils.Cache,
 	logger *slog.Logger,
 ) (*mcp.CallToolResultFor[interface{}], error) {
 	logger.Debug("Handling get_hatena_bookmarks request", "arguments", arguments)
@@ -103,13 +99,6 @@ func handleGetBookmarks(
 		Date:     arguments.Date,
 		URL:      arguments.URL,
 		Page:     arguments.Page,
-	}
-
-	// Check cache first
-	cacheKey := utils.GenerateCacheKey(params)
-	if cachedResult, found := cache.Get(cacheKey); found {
-		logger.Debug("Returning cached result", "cache_key", cacheKey)
-		return createSuccessResult(cachedResult), nil
 	}
 
 	// Get bookmarks from service
@@ -136,9 +125,6 @@ func handleGetBookmarks(
 		}, nil
 	}
 
-	// Cache the result
-	cache.Set(cacheKey, result)
-	
 	logger.Info("Successfully retrieved bookmarks", 
 		"username", params.Username,
 		"bookmark_count", len(result.Bookmarks))

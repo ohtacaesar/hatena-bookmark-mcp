@@ -7,7 +7,6 @@ A Model Context Protocol (MCP) server for accessing Hatena Bookmark RSS feeds. T
 - **Get Bookmarks**: Retrieve bookmarks from any Hatena Bookmark user's RSS feed
 - **Filtering**: Filter bookmarks by tag, date, or URL
 - **Pagination**: Support for paginated results (20 bookmarks per page)
-- **Caching**: In-memory caching for improved performance (5-minute TTL)
 - **Structured Output**: Returns bookmarks in JSON format with metadata
 - **Error Handling**: Comprehensive error handling with detailed error messages
 - **Logging**: Structured logging with configurable levels
@@ -121,10 +120,6 @@ Retrieve bookmarks from a Hatena Bookmark user's RSS feed.
 
 - `LOG_LEVEL`: Set logging level (`debug`, `info`, `warn`, `error`) - Default: `info`
 
-### Caching
-
-The server includes an in-memory cache with a 5-minute TTL (Time To Live) to reduce API calls to Hatena Bookmark and improve response times for repeated requests.
-
 ## API Limitations
 
 ### Hatena Bookmark RSS Feed Constraints
@@ -164,7 +159,6 @@ hatena-bookmark-mcp/
 │   ├── errors/handler.go   # Error handling utilities
 │   └── utils/              # Utility functions
 │       ├── validator.go    # Input validation
-│       └── cache.go        # Caching functionality
 ├── test/                   # Test files
 └── Makefile               # Build automation
 ```
@@ -174,7 +168,6 @@ hatena-bookmark-mcp/
 1. **BookmarkService**: Handles HTTP requests to Hatena Bookmark RSS feeds
 2. **RSSParser**: Parses RSS XML and converts to structured data
 3. **Validator**: Validates input parameters
-4. **Cache**: Provides in-memory caching for performance
 5. **ErrorHandler**: Centralized error handling and logging
 
 ### Adding New Features
