@@ -85,3 +85,38 @@ type MCPError struct {
 func (e *MCPError) Error() string {
 	return e.Message
 }
+
+// RDF XML structure for parsing Hatena Bookmark RDF/RSS 1.0 feeds
+type RDF struct {
+	XMLName string     `xml:"http://www.w3.org/1999/02/22-rdf-syntax-ns# RDF"`
+	Channel RDFChannel `xml:"channel"`
+	Items   []RDFItem  `xml:"item"`
+}
+
+// RDFChannel represents the RDF channel element
+type RDFChannel struct {
+	About       string `xml:"about,attr"`
+	Title       string `xml:"title"`
+	Link        string `xml:"link"`
+	Description string `xml:"description"`
+	Items       struct {
+		Seq struct {
+			Li []struct {
+				Resource string `xml:"resource,attr"`
+			} `xml:"http://www.w3.org/1999/02/22-rdf-syntax-ns# li"`
+		} `xml:"http://www.w3.org/1999/02/22-rdf-syntax-ns# Seq"`
+	} `xml:"items"`
+}
+
+// RDFItem represents a single RDF item (bookmark) with proper namespace handling
+type RDFItem struct {
+	About         string `xml:"about,attr"`
+	Title         string `xml:"title"`
+	Link          string `xml:"link"`
+	Description   string `xml:"description"`
+	Creator       string `xml:"http://purl.org/dc/elements/1.1/ creator"`
+	Date          string `xml:"http://purl.org/dc/elements/1.1/ date"`
+	Subject       string `xml:"http://purl.org/dc/elements/1.1/ subject"`
+	BookmarkCount int    `xml:"http://www.hatena.ne.jp/info/xmlns# bookmarkcount"`
+	ContentEncoded string `xml:"http://purl.org/rss/1.0/modules/content/ encoded"`
+}
